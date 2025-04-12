@@ -1,24 +1,28 @@
 /**
  *
  * @param {Number} status
- * @param {String} error_message
+ * @param {String | Undefined} message
+ * @param {Object} data
  * @returns Object
+ *
+ * {
+ * "status" : Integer: 201,
+ * "“message": String: “User created successfully”
+ * "data" : Object: {...} or [{...}, {...}]
+ * }
+ *
  */
-const error_response_json = function (
-  status = 500,
-  error_message = "Internal Server Error"
-) {
-  return { status: status, error: error_message };
-};
 
-
-const response_json = function (
-  status = 200,
-  message = "",
-  data = {}
-) {
+function successRes(status = 200, message = undefined, data = {}) {
   return { status, message, data };
-};
+}
 
+class ApiError extends Error {
+  constructor(statusCode, message, isOperational = true) {
+    super(message);
+    this.statusCode = statusCode;
+    this.isOperational = isOperational;
+  }
+}
 
-module.exports = {error_response_json, response_json}
+module.exports = { successRes, ApiError };

@@ -1,37 +1,32 @@
-// const storage = require("./models/file_storage");
+const { storage } = require('./models');
+const app = require('./app');
 
-const { User, storage, Session } = require("./models");
+let server;
 
-async function main() {
+async function start() {
   await storage.reload();
 
-  const user_details = {
-    firstName: "Test",
-    lastName: "User",
-    email: "test_user@mail.com",
-    password: "Test123",
-    address: "12, Oshodi road",
-    bio: "Works daily",
-    occupation: "Frontend dev",
-    expertise: "React",
-  };
+  const port = process.env.PORT || 3000;
+  const host = process.env.HOST || 'localhost';
 
-  const session_details = {
-    mentorId: "123",
-    menteeId: "234",
-    questions: "Whoo?",
-    menteeEmail: "mentee@email.com",
-  };
-
-  const u = await User.create(user_details);
-  const s = await Session.create(session_details);
-
-  u.role = "mentor";
-  u.save();
-
-  const all_s = User.filter_by({ id: 1, role: "mentor" });
-  console.log(all_s);
-
-  await storage.close();
+  server = app.listen(port, host, () => {
+    /* eslint-disable no-console */
+    console.log(`Server is running on port ${port} on ${host}`);
+  });
 }
-main();
+start();
+
+const exitHandler = async () => {
+  await storage.close();
+  if (server) server.close(() => console.log('Server closed'));
+};
+
+const unexpectedErrorHandler = (error) => {
+  console.error(error);
+  exitHandler();
+  process.exit(1);
+};
+
+process.on('uncaughtException', unexpectedErrorHandler);
+process.on('unhandledRejection', unexpectedErrorHandler);
+process.on('SIGTERM', exitHandler);

@@ -1,66 +1,73 @@
-const storage = require("./file_storage");
+const storage = require('./file_storage');
 
 class BaseModel {
+  /**
+   *
+   * @param {object} params
+   * @returns {BaseModel}
+   */
   initialize_data(params) {
-    for (const [key, value] of Object.entries(params)) {
+    Object.entries(params).forEach(([key, value]) => {
       this[key] = value;
-    }
-    // return this;
+    });
+    return this;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   async save() {
     await storage.save();
   }
 
   /**
    *
-   * @param {*} params
-   * @param {*} cls
-   * @returns
+   * @param {object} params
+   * @param {*} Cls Class Constructor/Name
+   * @returns {Promise<BaseModel>}
    */
-  static async create(params, cls) {
-    const new_data = new cls(params);
-    const new_data_id = storage.get_next_seq(`${cls.name}_id_seq`);
-    if (new_data_id === undefined) throw Error("Model pk sequence not found");
+  static async create(params, Cls) {
+    const newData = new Cls(params);
+    const newDataId = storage.get_next_seq(`${Cls.name}_id_seq`);
+    if (newDataId === undefined) throw Error('Model pk sequence not found');
 
-    new_data.id = new_data_id;
+    newData.id = newDataId;
 
-    storage.new(new_data);
+    storage.new(newData);
     await storage.save();
 
-    return new_data;
+    return newData;
   }
 
   /**
    *
    * @param {object} filter_obj
-   * @param {class} cls
+   * @param {class} Cls
    * @returns Array
    */
-  static filter_by(filter_obj, cls) {
-    const all_objs = storage.get_all_objects();
-    const model_objs = Object.keys(all_objs)
-      .filter((key) => key.startsWith(`${cls.name}.`))
-      .map((key) => all_objs[key]);
+  static filter_by(filterObj, Cls) {
+    const allObjs = storage.get_all_objects();
+    const modelObjs = Object.keys(allObjs)
+      .filter((key) => key.startsWith(`${Cls.name}.`))
+      .map((key) => allObjs[key]);
 
-    const filtered_objs = model_objs.filter((obj) => {
+    const filteredObjects = modelObjs.filter((obj) => {
       let matches = true;
-
-      for (const [key, value] of Object.entries(filter_obj)) {
+      Object.entries(filterObj).forEach(([key, value]) => {
         matches = matches && obj[key] === value;
-      }
+      });
       return matches;
     });
-    return filtered_objs;
+    return filteredObjects;
   }
 
   to_obj() {
-    const new_obj = {};
-    for (const [key, value] of Object.entries(this)) {
-      if (value !== undefined) new_obj[key] = value;
-    }
-    new_obj["__class__"] = this.constructor.name;
-    return new_obj;
+    const newObj = {};
+    Object.entries(this).forEach(([key, value]) => {
+      if (value !== undefined) newObj[key] = value;
+    });
+
+    /* eslint-disable no-underscore-dangle */
+    newObj.__class__ = this.constructor.name;
+    return newObj;
   }
 
   to_json() {
@@ -71,10 +78,10 @@ class BaseModel {
   }
 
   async delete() {
-    const all_objs = storage.get_all_objects();
-    const obj_id = `${this.constructor.name}.${this.id}`;
+    const allObjs = storage.get_all_objects();
+    const objId = `${this.constructor.name}.${this.id}`;
 
-    delete all_objs[obj_id];
+    delete allObjs[objId];
 
     await storage.reload();
   }

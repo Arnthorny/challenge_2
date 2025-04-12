@@ -1,31 +1,42 @@
-const { BaseModel } = require("./index");
+const { BaseModel } = require('./index');
 
 class Session extends BaseModel {
   id;
-  mentorId;
-  menteeId;
-  questions;
-  menteeEmail;
-  status = "pending"; // Can be pending, accepted or rejected
 
-  constructor(param_obj) {
+  mentorId;
+
+  menteeId;
+
+  questions;
+
+  menteeEmail;
+
+  status = 'pending'; // Can be pending, accepted or rejected
+
+  constructor(paramObj) {
     // Used initialization method to avoid field declaration overwriting instance properties
 
     super();
-    this.initialize_data(param_obj);
+    this.initialize_data(paramObj);
   }
 
   static async create(params) {
-    const new_session = await super.create(params, this);
+    const newSession = await super.create(params, this);
 
-    return new_session;
+    return newSession;
   }
 
+  /**
+   *
+   * @param {Number} id
+   * @returns {Session | undefined}
+   */
   static get_by_id(id) {
-    return this.filter_by({ id: id })[0];
+    return this.filter_by({ id })[0];
   }
-  static filter_by(filter_obj) {
-    return super.filter_by(filter_obj, this);
+
+  static filter_by(filterObj) {
+    return super.filter_by(filterObj, this);
   }
 
   static get_all() {
@@ -33,11 +44,11 @@ class Session extends BaseModel {
   }
 
   to_json() {
-    const new_obj = super.to_json();
+    const newObj = super.to_json();
 
-    new_obj["sessionId"] = new_obj["id"];
-    delete new_obj["id"];
-    return new_obj;
+    newObj.sessionId = newObj.id;
+    delete newObj.id;
+    return newObj;
   }
 }
 module.exports = Session;

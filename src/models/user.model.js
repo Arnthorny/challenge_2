@@ -1,51 +1,75 @@
-const { BaseModel } = require("./index");
+const { BaseModel } = require('./index');
+const { ApiError } = require('../utils/resp_handling');
 
 class User extends BaseModel {
   id;
-  firstName;
-  lastName;
-  email;
-  password;
-  address;
-  bio;
-  occupation;
-  expertise;
-  role = "user"; // Can be user, mentor or admin
-  static excluded_fields = ["role", "password"];
 
-  constructor(param_obj) {
+  firstName;
+
+  lastName;
+
+  email;
+
+  password;
+
+  address;
+
+  bio;
+
+  occupation;
+
+  expertise;
+
+  role = 'user'; // Can be user, mentor or admin
+
+  static excluded_fields = ['role', 'password'];
+
+  constructor(paramObj) {
     // Used initialization method to avoid field declaration overwriting instance properties
     super();
-    this.initialize_data(param_obj);
+    this.initialize_data(paramObj);
   }
 
+  /**
+   *
+   * @param {Number} id
+   * @returns {User | undefined}
+   */
   static get_by_id(id) {
-    return this.filter_by({ id: id })[0];
+    return this.filter_by({ id })[0];
   }
 
-  static filter_by(filter_obj) {
-    return super.filter_by(filter_obj, this);
+  /**
+   *
+   * @param {Object} filterObj
+   * @returns {User[]}
+   */
+  static filter_by(filterObj) {
+    return super.filter_by(filterObj, this);
   }
 
+  /**
+   *
+   * @returns {User[u]}
+   */
   static get_all() {
     return this.filter_by({}, this);
   }
 
   static async create(params) {
-    const email_unique = this.filter_by({ email: params.email }).length === 0;
-    if (!email_unique) throw Error("This email already exists");
+    const emailUnique = this.filter_by({ email: params.email }).length === 0;
+    if (!emailUnique) throw ApiError(400, 'Email already exists');
 
-    const new_user = await super.create(params, this);
+    const newUser = await super.create(params, this);
 
-    return new_user;
+    return newUser;
   }
-  to_json() {
-    const new_obj = super.to_json();
 
-    for (const field in this.constructor.excluded_fields) {
-      delete new_obj[field];
-    }
-    return new_obj;
+  to_json() {
+    const newObj = super.to_json();
+
+    this.constructor.excluded_fields.forEach((field) => delete newObj[field]);
+    return newObj;
   }
 }
 

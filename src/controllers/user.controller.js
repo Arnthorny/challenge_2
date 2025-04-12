@@ -1,63 +1,50 @@
-const httpStatus = require("http-status");
-const Joi = require("joi");
+require('dotenv').config();
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
-const userRouter = express.Router();
-const bcrypt = require("bcryptjs");
-
-const { User } = require("../models");
 const {
-  error_response_json: error_res,
-  response_json,
-} = require("../utils/resp_handling");
-// const pick = require('../utils/pick');
-// const ApiError = require('../utils/ApiError');
-// const catchAsync = require('../utils/catchAsync');
-// const { userService } = require('../services');
+  loginSchema,
+  signupSchema,
+  userIdParamSchema,
+  mentorIdParamSchema,
+} = require('../schemas/validation.schema');
+const { User } = require('../models');
 
-const joi_regular_str = Joi.string().trim().required().max(50).min(1);
-
-const signupSchema = Joi.object({
-  firstName: joi_regular_str,
-  lastName: joi_regular_str,
-  password: joi_regular_str,
-  email: Joi.string().email(),
-  address: Joi.string().trim().required().max(200).min(1),
-  bio: Joi.string().trim().required().min(5),
-  occupation: joi_regular_str,
-  expertise: Joi.string().trim().required().max(100).min(1),
-});
-
-const loginSchema = Joi.object({
-  email: Joi.string().email(),
-  password: joi_regular_str,
-});
+const {
+  successRes: successResJson,
+  ApiError,
+} = require('../utils/resp_handling');
 
 class UserController {
-  static genToken(param) {}
+  static genToken(payload) {
+    const newtoken = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRY_TIME,
+    });
+    return newtoken;
+  }
 
   static async createUser(req, res, next) {
     try {
       const validation = signupSchema.validate(req.body);
 
-      if (validation.error)
-        res
-          .status(422)
-          .json(error_res(422, validation.error.details[0].message));
+      if (validation.error) {
+        throw new ApiError(422, validation.error.details[0].message);
+      }
 
       const { password, ...bodyDup } = validation.value;
-      bodyDup["password"] = bcrypt.hashSync(password, 15);
+      bodyDup.password = bcrypt.hashSync(password, 15);
 
       const user = await User.create(bodyDup);
       const token = this.genToken(user.to_json());
 
-      const res_obj = {
+      const resObj = {
         token,
-        message: "User created successfully",
+        message: 'User created successfully',
       };
 
       res
         .status(201)
-        .json(response_json(201, "User created successfully", res_obj));
+        .json(successResJson(201, 'User created successfully', resObj));
     } catch (err) {
       next(err);
     }
@@ -67,68 +54,78 @@ class UserController {
     try {
       const validation = loginSchema.validate(req.body);
 
-      if (validation.error)
-        res
-          .status(422)
-          .json(error_res(422, validation.error.details[0].message));
-
+      if (validation.error) {
+        throw new ApiError(422, validation.error.details[0].message);
+      }
       const { email, password } = validation.value;
 
       const user = User.filter_by({ email })[0];
 
-      if (!user || !bcrypt.compareSync(password, user.password))
-        res.status(400).json(error_res(400, "Invalid username or password"));
-      else {
-        res.status(200).json({
-          message: "Login successful",
-          data: {
-            username: user.username,
-            _id: user._id,
-          },
-        });
+      if (!user || !bcrypt.compareSync(password, user.password)) {
+        throw new ApiError(400, 'Invalid username or password');
+      } else {
+        const token = this.genToken(user.to_json());
+        const resObj = { token };
+
+        res
+          .status(200)
+          .json(successResJson(200, 'User is successfully logged in', resObj));
       }
     } catch (error) {
       next(error);
     }
   }
 
-  static async getUsers(req, res, next) {
+  static async updateUser(req, res, next) {
     try {
-      const all_instances = await User.get_all();
-      res.send(result);
-    } catch (err) {
-      next(err);
-    }
-  }
-
-  static async getUser(req, res, next) {
-    try {
-      const user = await userService.getUserById(req.params.userId);
-      if (!user) {
-        throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+      if (req.user.role !== 'admin') {
+        throw new ApiError(403, 'Admin only request');
       }
-      res.send(user);
+      const validation = userIdParamSchema.validate(req.params);
+      if (validation.error) {
+        throw new ApiError(422, validation.error.details[0].message);
+      }
+      const { userId } = validation.value;
+      const userToUpdate = User.get_by_id(userId);
+
+      if (userToUpdate === undefined) {
+        throw new ApiError(404, `User with id ${userId} not found`);
+      }
+      userToUpdate.role = 'mentor';
+      await userToUpdate.save();
+
+      const data = { message: 'User account changed to mentor' };
+      res.status(200).json(successResJson(200, undefined, data));
     } catch (err) {
       next(err);
     }
   }
 
-  static async updateUser(req, res) {
+  static async getAllMentors(req, res, next) {
     try {
-      const user = await userService.updateUserById(
-        req.params.userId,
-        req.body
-      );
-      res.send(user);
+      let allMentors = User.filter_by({ role: 'mentor' });
+      allMentors = allMentors.map((mentor) => mentor.to_json());
+
+      res.status(200).json(successResJson(200, undefined, allMentors));
     } catch (err) {
       next(err);
     }
   }
 
-  static async deleteUser(req, res) {
+  static async getSpecificMentor(req, res, next) {
     try {
-      await userService.deleteUserById(req.params.userId);
-      res.status(httpStatus.NO_CONTENT).send();
+      const validation = mentorIdParamSchema.validate(req.params);
+      if (validation.error) {
+        throw new ApiError(422, validation.error.details[0].message);
+      }
+      const { mentorId } = validation.value;
+
+      const mentor = User.filter_by({ role: 'mentor', id: mentorId })[0];
+
+      if (mentor === undefined) {
+        throw new ApiError(404, `Mentor with id: ${mentorId} not found`);
+      }
+      res.status(200).json(successResJson(200, undefined, mentor.to_json()));
     } catch (err) {
       next(err);
     }
