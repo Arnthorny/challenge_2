@@ -25,7 +25,7 @@ class SessionController {
 
       const mentor = User.filter_by({ role: 'mentor', id: mentorId })[0];
       if (mentor === undefined) {
-        throw new ApiError(404, `Mentor with id: ${mentorId} not found`);
+        throw new ApiError(404, `Mentor with id ${mentorId} not found`);
       }
 
       newSessObj.mentorId = mentorId;
@@ -56,7 +56,11 @@ class SessionController {
 
       const sess = Session.get_by_id(sessionId);
       if (sess === undefined) {
-        throw new ApiError(404, `Session with id: ${sessionId} not found`);
+        throw new ApiError(404, `Session with id ${sessionId} not found`);
+      }
+
+      if (sess.mentorId !== req.user.id) {
+        throw new ApiError(403, 'Only assigned mentor can make requests');
       }
 
       const status = basename(req.path) === 'accept' ? 'accepted' : 'rejected';
@@ -102,7 +106,7 @@ class SessionController {
 
       const sess = Session.get_by_id(sessionId);
       if (sess === undefined) {
-        throw new ApiError(404, `Session with id: ${sessionId} not found`);
+        throw new ApiError(404, `Session with id ${sessionId} not found`);
       }
       // Only mentee for given session can review session
       if (sess.menteeId !== req.user.id) {
@@ -139,10 +143,10 @@ class SessionController {
 
       const sess = Session.get_by_id(sessionId);
       if (sess === undefined) {
-        throw new ApiError(404, `Session with id: ${sessionId} not found`);
+        throw new ApiError(404, `Session with id ${sessionId} not found`);
       }
 
-      if (req.user.role === 'admin') {
+      if (req.user.role !== 'admin') {
         throw new ApiError(403, 'Admin only request');
       }
 

@@ -143,6 +143,77 @@ const options = {
             },
           },
         },
+        SessionReqBody: {
+          type: 'object',
+          properties: {
+            mentorId: {
+              type: 'integer',
+            },
+            questions: {
+              type: 'string',
+            },
+          },
+        },
+        SessionReviewBody: {
+          type: 'object',
+          properties: {
+            score: {
+              type: 'integer',
+              minimum: 1,
+              maximum: 5,
+            },
+            remark: {
+              type: 'string',
+            },
+          },
+        },
+        SessionReviewRespSchema: {
+          type: 'object',
+          properties: {
+            mentorId: {
+              type: 'integer',
+            },
+            sessionId: {
+              type: 'integer',
+            },
+            menteeId: {
+              type: 'integer',
+            },
+            remark: {
+              type: 'string',
+            },
+            menteeFullName: {
+              type: 'string',
+            },
+            score: {
+              type: 'integer',
+            },
+          },
+        },
+        SessionRespSchema: {
+          type: 'object',
+          properties: {
+            mentorId: {
+              type: 'integer',
+            },
+            sessionId: {
+              type: 'integer',
+            },
+            menteeId: {
+              type: 'integer',
+            },
+            menteeEmail: {
+              type: 'string',
+            },
+            questions: {
+              type: 'string',
+            },
+            status: {
+              type: 'string',
+              enum: ['pending', 'accepted', 'rejected'],
+            },
+          },
+        },
       },
     },
     servers: [

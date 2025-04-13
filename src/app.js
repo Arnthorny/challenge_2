@@ -12,9 +12,9 @@ const router = express.Router();
 
 app.use(express.json());
 
-router.use('/api/v1', swaggerUI.serve, swaggerUI.setup(openapiSpecification));
 router.use('/api/v1', sessionRoutes);
 router.use('/api/v1', userRoutes);
+router.use('/api/v1', swaggerUI.serve, swaggerUI.setup(openapiSpecification));
 
 app.use(router);
 

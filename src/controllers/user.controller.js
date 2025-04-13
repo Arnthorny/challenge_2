@@ -123,7 +123,7 @@ class UserController {
       const mentor = User.filter_by({ role: 'mentor', id: mentorId })[0];
 
       if (mentor === undefined) {
-        throw new ApiError(404, `Mentor with id: ${mentorId} not found`);
+        throw new ApiError(404, `Mentor with id ${mentorId} not found`);
       }
       res.status(200).json(successResJson(200, undefined, mentor.to_json()));
     } catch (err) {

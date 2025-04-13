@@ -19,7 +19,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /auth/signup:
+ * /api/v1/auth/signup:
  *   post:
  *     summary: Register as user
  *     tags: [Authentication]
@@ -67,7 +67,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /auth/signin:
+ * /api/v1/auth/signin:
  *   post:
  *     summary: Login as user
  *     tags: [Authentication]
@@ -115,7 +115,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /user/:userId:
+ * /api/v1/user/{userId}:
  *   patch:
  *     summary: Change user to a mentor.
  *     tags: [Admin]
@@ -153,6 +153,12 @@ module.exports = router;
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/GenericErrorObj'
+ *       401:
+ *         description: Unauthorized request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/GenericErrorObj'
  *       404:
  *         description: User not found
  *         content:
@@ -175,7 +181,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /mentors/:mentorId:
+ * /api/v1/mentors/{mentorId}:
  *   get:
  *     summary: Get a specific mentor.
  *     tags: [Mentors]
@@ -222,7 +228,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /mentors:
+ * /api/v1/mentors:
  *   get:
  *     summary: Get all mentors.
  *     tags: [Mentors]
@@ -241,18 +247,6 @@ module.exports = router;
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/MentorSchema'
- *       404:
- *         description: Mentor not found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/GenericErrorObj'
- *       422:
- *         description: Validation error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/GenericErrorObj'
  *       500:
  *         description: Internal error
  *         content:
