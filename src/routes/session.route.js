@@ -7,24 +7,36 @@ const SessionController = require('../controllers/session.controller');
 
 router
   .route('/sessions')
-  .post(Auth.tokenAuthentication, SessionController.createSession)
-  .get(Auth.tokenAuthentication, SessionController.getAllSessions);
+  .post(
+    Auth.tokenAuthentication,
+    SessionController.createSession.bind(SessionController),
+  )
+  .get(
+    Auth.tokenAuthentication,
+    SessionController.getAllSessions.bind(SessionController),
+  );
 
 router.patch(
   '/sessions/:sessionId/accept',
   Auth.tokenAuthentication,
-  SessionController.rejectOrAcceptSession,
+  SessionController.rejectOrAcceptSession.bind(SessionController),
 );
 router.patch(
   '/sessions/:sessionId/reject',
   Auth.tokenAuthentication,
-  SessionController.rejectOrAcceptSession,
+  SessionController.rejectOrAcceptSession.bind(SessionController),
 );
 
 router
   .route('/sessions/:sessionId/review')
-  .post(Auth.tokenAuthentication, SessionController.reviewSession)
-  .delete(Auth.tokenAuthentication, SessionController.deleteSessionReview);
+  .post(
+    Auth.tokenAuthentication,
+    SessionController.reviewSession.bind(SessionController),
+  )
+  .delete(
+    Auth.tokenAuthentication,
+    SessionController.deleteSessionReview.bind(SessionController),
+  );
 
 module.exports = router;
 

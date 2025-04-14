@@ -5,7 +5,7 @@ const { errorHandler } = require('./middlewares/error');
 const { ApiError } = require('./utils/resp_handling');
 const userRoutes = require('./routes/user.route');
 const sessionRoutes = require('./routes/session.route');
-const openapiSpecification = require('../swagger-options');
+const openapiSpecification = require('./swagger-options');
 
 const app = express();
 const router = express.Router();

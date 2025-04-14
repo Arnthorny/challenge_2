@@ -4,12 +4,12 @@ const { ApiError } = require('../utils/resp_handling');
 
 async function getUserFromAuthorization(req) {
   try {
-    const { authInfo } = req.headers;
+    const { token } = req.headers;
 
-    if (!authInfo) {
+    if (!token) {
       return null;
     }
-    const decodedObject = jwt.verify(authInfo[1], process.env.JWT_SECRET);
+    const decodedObject = jwt.verify(token, process.env.JWT_SECRET);
     const { id } = decodedObject;
 
     const user = User.get_by_id(id);

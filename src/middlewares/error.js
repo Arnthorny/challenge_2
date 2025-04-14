@@ -4,8 +4,8 @@ const httpStatus = require('http-status');
 const errorHandler = (err, req, res, next) => {
   let { statusCode, message } = err;
   if (!err.isOperational) {
-    statusCode = httpStatus.INTERNAL_SERVER_ERROR;
-    message = message || httpStatus[httpStatus.INTERNAL_SERVER_ERROR];
+    statusCode = httpStatus.default.INTERNAL_SERVER_ERROR;
+    message = message || httpStatus.default['500'];
 
     /* eslint-disable no-console */
     console.error(err);

@@ -50,7 +50,7 @@ class User extends BaseModel {
 
   /**
    *
-   * @returns {User[u]}
+   * @returns {User[]}
    */
   static get_all() {
     return this.filter_by({}, this);

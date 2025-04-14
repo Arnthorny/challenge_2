@@ -5,15 +5,18 @@ const router = express.Router();
 const Auth = require('../middlewares/authentication_token');
 const UserController = require('../controllers/user.controller');
 
-router.post('/auth/signup', UserController.createUser);
-router.post('/auth/signin', UserController.loginUser);
+router.post('/auth/signup', UserController.createUser.bind(UserController));
+router.post('/auth/signin', UserController.loginUser.bind(UserController));
 router.patch(
   '/user/:userId',
   Auth.tokenAuthentication,
-  UserController.updateUser,
+  UserController.updateUser.bind(UserController),
 );
-router.get('/mentors', UserController.getAllMentors);
-router.get('/mentors/:mentorId', UserController.getSpecificMentor);
+router.get('/mentors', UserController.getAllMentors.bind(UserController));
+router.get(
+  '/mentors/:mentorId',
+  UserController.getSpecificMentor.bind(UserController),
+);
 
 module.exports = router;
 
