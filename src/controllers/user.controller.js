@@ -35,7 +35,6 @@ class UserController {
       bodyDup.password = bcrypt.hashSync(password, 15);
 
       const user = await User.create(bodyDup);
-      console.log(user, this);
       const token = this.genToken(user.to_json());
 
       const resObj = {
@@ -63,7 +62,7 @@ class UserController {
       const user = User.filter_by({ email })[0];
 
       if (!user || !bcrypt.compareSync(password, user.password)) {
-        throw new ApiError(400, 'Invalid username or password');
+        throw new ApiError(400, 'Invalid email or password');
       } else {
         const token = this.genToken(user.to_json());
         const resObj = { token };

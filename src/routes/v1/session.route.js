@@ -2,8 +2,8 @@ const express = require('express');
 
 const router = express.Router();
 
-const Auth = require('../middlewares/authentication_token');
-const SessionController = require('../controllers/session.controller');
+const Auth = require('../../middlewares/authentication_token');
+const SessionController = require('../../controllers/session.controller');
 
 router
   .route('/sessions')

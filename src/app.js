@@ -3,8 +3,7 @@ const swaggerUI = require('swagger-ui-express');
 
 const { errorHandler } = require('./middlewares/error');
 const { ApiError } = require('./utils/resp_handling');
-const userRoutes = require('./routes/user.route');
-const sessionRoutes = require('./routes/session.route');
+const v1Routes = require('./routes/v1');
 const openapiSpecification = require('./swagger-options');
 
 const app = express();
@@ -12,8 +11,7 @@ const router = express.Router();
 
 app.use(express.json());
 
-router.use('/api/v1', sessionRoutes);
-router.use('/api/v1', userRoutes);
+router.use('/api', v1Routes);
 router.use('/api/v1', swaggerUI.serve, swaggerUI.setup(openapiSpecification));
 
 app.use(router);

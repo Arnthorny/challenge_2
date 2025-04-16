@@ -22,7 +22,7 @@ class User extends BaseModel {
 
   role = 'user'; // Can be user, mentor or admin
 
-  static excluded_fields = ['role', 'password'];
+  static excluded_fields = ['role'];
 
   constructor(paramObj) {
     // Used initialization method to avoid field declaration overwriting instance properties
@@ -58,7 +58,7 @@ class User extends BaseModel {
 
   static async create(params) {
     const emailUnique = this.filter_by({ email: params.email }).length === 0;
-    if (!emailUnique) throw ApiError(400, 'Email already exists');
+    if (!emailUnique) throw new ApiError(400, 'Email already exists');
 
     const newUser = await super.create(params, this);
 

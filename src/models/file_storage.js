@@ -3,7 +3,7 @@ const path = require('path');
 
 class FileStorage {
   // Represents a data storage class
-  #fileName = 'data_store.json';
+  #fileName = '.data_store.json';
 
   #filePath = path.join(process.cwd(), this.#fileName);
 
