@@ -1,3 +1,4 @@
+require('dotenv').config();
 const fsPromises = require('fs').promises;
 const path = require('path');
 
@@ -53,6 +54,8 @@ class FileStorage {
       else objectsDict[key] = value;
     });
 
+    if (process.env.HAS_FILESYSTEM === false) return;
+
     try {
       await fsPromises.writeFile(this.#filePath, JSON.stringify(objectsDict));
     } catch (err) {
@@ -71,6 +74,8 @@ class FileStorage {
 
     // Deserializes JSON file to #objects
     let newObj = {};
+
+    if (process.env.HAS_FILESYSTEM === false) return;
 
     try {
       const fileStr = await fsPromises.readFile(this.#filePath, {
