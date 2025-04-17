@@ -35,6 +35,7 @@ class UserController {
       bodyDup.password = bcrypt.hashSync(password, 15);
 
       const user = await User.create(bodyDup);
+      
       const token = this.genToken(user.to_json());
 
       const resObj = {

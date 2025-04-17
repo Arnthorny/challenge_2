@@ -227,7 +227,7 @@ const options = {
 
 // swaggerJsdoc(swaggerDocOptions)
 const OASdoc = swaggerJsdoc({
-  apis: ['./src/routes/*.route.js'], // files containing annotations as above
+  apis: ['./src/routes/v1/*.route.js'], // files containing annotations as above
   ...options,
 });
 module.exports = OASdoc;

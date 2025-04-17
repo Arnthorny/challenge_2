@@ -2,13 +2,9 @@ const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-// const UserController = require('../controllers/user.controller');
 const { User } = require('../models');
 
 const app = require('../app');
-
-// jest.mock('../models/comment')
-// jest.unmock('../models/user.model');
 
 jest.setTimeout(15000);
 

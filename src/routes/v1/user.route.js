@@ -8,9 +8,14 @@ router.patch(
   Auth.tokenAuthentication,
   UserController.updateUser.bind(UserController),
 );
-router.get('/mentors', UserController.getAllMentors.bind(UserController));
+router.get(
+  '/mentors',
+  Auth.tokenAuthentication,
+  UserController.getAllMentors.bind(UserController),
+);
 router.get(
   '/mentors/:mentorId',
+  Auth.tokenAuthentication,
   UserController.getSpecificMentor.bind(UserController),
 );
 
@@ -88,6 +93,13 @@ module.exports = router;
  *     summary: Get a specific mentor.
  *     tags: [Mentors]
  *     parameters:
+ *       - in: header
+ *         name: token
+ *         required: true
+ *         description: Auth token
+ *         schema:
+ *           type: string
+ *           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
  *       - in: path
  *         name: mentorId
  *         required: true
@@ -96,6 +108,12 @@ module.exports = router;
  *           type: integer
  *           minimum: 1
  *     responses:
+ *       401:
+ *         description: Unauthorized request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/GenericErrorObj'
  *       200:
  *         description: Retrieval successful
  *         content:
@@ -134,7 +152,21 @@ module.exports = router;
  *   get:
  *     summary: Get all mentors.
  *     tags: [Mentors]
+ *     parameters:
+ *       - in: header
+ *         name: token
+ *         required: true
+ *         description: Auth token
+ *         schema:
+ *           type: string
+ *           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
  *     responses:
+ *       401:
+ *         description: Unauthorized request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/GenericErrorObj'
  *       200:
  *         description: Retrieval successful
  *         content:
